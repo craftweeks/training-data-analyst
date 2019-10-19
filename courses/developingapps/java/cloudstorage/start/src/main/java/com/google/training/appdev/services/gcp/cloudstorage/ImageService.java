@@ -17,7 +17,7 @@ package com.google.training.appdev.services.gcp.cloudstorage;
 
 // TODO: Write a star import for Cloud Storage
 
-
+import com.google.cloud.storage.*;
 
 // END TODO
 
@@ -37,9 +37,9 @@ public class ImageService {
 // static method.
 // Use the getService() method to get the storage client
 
-
-
-
+private static Storage storage = StorageOptions
+    .getDefaultInstance()
+    .getService();
 
 // END TODO
 
@@ -48,7 +48,8 @@ public class ImageService {
 // Get the value using ${google.storage.bucket}
 // This references the GCLOUD_BUCKET environment variable
 
-
+    @Value("${google.storage.bucket}")
+    private String bucketName;
 
 // END TODO
 
@@ -69,7 +70,14 @@ public class ImageService {
     // Set the content type from the file
     // Set the object ACL to Public Read
 
-
+	BlobInfo blobInfo = storage.create(
+		BlobInfo.newBuilder(bucketName, fileName)
+				.setContentType(file.getContentType())
+				.setAcl(new ArrayList<>(
+				Arrays.asList(Acl.of(Acl.User.ofAllUsers(),
+									Acl.Role.READER))))
+				.build(),
+		file.getInputStream());
 
     // END TODO
 
@@ -77,7 +85,7 @@ public class ImageService {
     // https://storage.googleapis.com/[BUCKET]/[OBJECT]
     // Use String concatentation to create return the URL
 
-    return "Replace with the Cloud Storage Public URL";
+        return "https://storage-download.googleapis.com/" + bucketName+ "/" +fileName;
 
     // END TODO
 
